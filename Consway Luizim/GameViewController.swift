@@ -7,23 +7,13 @@
 //
 
 /*
-Death by isolation: Each live cell with one or fewer live neighbors will die in the next generation.
-1 vizinho ou menos = transforma false
- 
-Births: Each dead cell adjacent to exactly three live neighbors will become live in the next generation.
-3 vizinhos = transforma true
+Qualquer célula viva com menos de dois vizinhos vivos morre de solidão.
+Qualquer célula viva com mais de três vizinhos vivos morre de superpopulação.
+Qualquer célula viva com dois ou três vizinhos vivos continua no mesmo estado para
+a próxima geração.
 
-Death by overcrowding: Each live cell with four or more live neighbors will die in the next generation.
->=4 vizinhos = transforma false
-
-Survival: Each live cell with either two or three live neighbors will remain alive for the next generation.
-2 ou 3 vizinhos = não muda
+Qualquer célula morta com exatamente três vizinhos vivos se torna uma célula viva.
 */
-
-//remover os child nodes do array de nodes com for
-//zerar o array. Array.removeall
-//criar um for duplos percorrendo a matriz nova se a pos for == true cria quadrado add na cena e no vetor
-
 
 import UIKit
 import QuartzCore
@@ -34,18 +24,14 @@ class GameViewController: UIViewController {
     let scene = SCNScene()
     lazy var sceneView = self.view as! SCNView
     
-    var gridSize:Int = 2
+    var gridSize:Int = 30
     
     var stepButton: UIButton!
     var linhasGrid: [Bool] = []
     var colunasGrid: [[Bool]] = []
-    
-    var count:Int = 0
-    //var linhasNextGenGrid: [Bool] = []
     var colunasNextGenGrid: [[Bool]] = []
     
     var countVizinhos:Int = 0
-    
     
     //array de cubos scnodes
     var arrayCubos = [SCNNode]()
@@ -58,16 +44,15 @@ class GameViewController: UIViewController {
         setupCamera()//camera setada
         setupGrid()//grid inicial setada
         createButton()//botao posicionado
-        let BoxCreator = UITapGestureRecognizer(target: self, action: #selector(BoxCreator(_:)))//action de criar box
+        let BoxCreator = UITapGestureRecognizer(target: self, action: #selector(BoxCreator(_:)))
+        //action de criar box
         sceneView.addGestureRecognizer(BoxCreator) //Cria box
-        
         super.viewDidLoad()
     }
     
     func setupCamera(){
         
         //1
-        //let boxGeometry = SCNBox(width: 1, height: 1, length: 1, chamferRadius: 0)
         let cameraReference = SCNNode()
         cameraReference.position = SCNVector3(x: 0, y: 0, z: 0)
         scene.rootNode.addChildNode(cameraReference)
@@ -79,7 +64,7 @@ class GameViewController: UIViewController {
         scene.rootNode.addChildNode(cameraNode)
         
         //colocar camera
-        cameraNode.position = SCNVector3(x: (Float(gridSize/2)), y: 15, z: (Float(gridSize/2)))
+        cameraNode.position = SCNVector3(x: (Float(gridSize/2)), y: 30, z: (Float(gridSize/2)))
         let lookConstraint = SCNLookAtConstraint(target: cameraReference)
         cameraNode.constraints = [lookConstraint]
         
@@ -308,19 +293,7 @@ class GameViewController: UIViewController {
                     }
                 }//ok
                 
-                
-//                switch countVizinhos {
-//                case 0...1:
-//                    colunasNextGenGrid[Int(xColunas)][Int(zLinhas)] = false
-//                case 2:
-//                    colunasNextGenGrid[Int(xColunas)][Int(zLinhas)] = colunasGrid[Int(xColunas)][Int(zLinhas)]
-//                case 3:
-//                    colunasNextGenGrid[Int(xColunas)][Int(zLinhas)] = true
-//                default:
-//                    colunasNextGenGrid[Int(xColunas)][Int(zLinhas)] = false
-//                }
-                
-                //regras
+                //Regras
                 
                 if colunasGrid[xColunas][zLinhas] == true {
                     if countVizinhos < 2 {
@@ -344,14 +317,7 @@ class GameViewController: UIViewController {
                     
                 }
                 
-                /*
-                 Qualquer célula viva com menos de dois vizinhos vivos morre de solidão.
-                 Qualquer célula viva com mais de três vizinhos vivos morre de superpopulação.
-                 Qualquer célula viva com dois ou três vizinhos vivos continua no mesmo estado para
-                 a próxima geração.
-                 
-                 Qualquer célula morta com exatamente três vizinhos vivos se torna uma célula viva.
-                 */
+                
                 
                 countVizinhos = 0
                 
