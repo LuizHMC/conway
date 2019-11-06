@@ -24,35 +24,29 @@ class GameViewController: UIViewController {
     let scene = SCNScene()
     lazy var sceneView = self.view as! SCNView
     
-    var gridSize:Int = 30
+    var gridSize:Int = 30//tamanho da grid
     
-    var stepButton: UIButton!
-    var linhasGrid: [Bool] = []
-    var colunasGrid: [[Bool]] = []
-    var colunasNextGenGrid: [[Bool]] = []
-    
-    var countVizinhos:Int = 0
-    
-    //array de cubos scnodes
-    var arrayCubos = [SCNNode]()
-    
-    
-    
-    
+    var stepButton: UIButton!//botão para dar o passo
+    var linhasGrid: [Bool] = []//linhas da grid original
+    var colunasGrid: [[Bool]] = []//grid original
+    var colunasNextGenGrid: [[Bool]] = []//grid auxiliar para setar a nova geração
+    var countVizinhos:Int = 0//contador de vizinhos para a lógica
+    var arrayCubos = [SCNNode]()//array de cubos scnodes para saber a referencia deles
     
     override func viewDidLoad() {
         setupCamera()//camera setada
         setupGrid()//grid inicial setada
         createButton()//botao posicionado
         let BoxCreator = UITapGestureRecognizer(target: self, action: #selector(BoxCreator(_:)))
-        //action de criar box
-        sceneView.addGestureRecognizer(BoxCreator) //Cria box
+        
+        
+        sceneView.addGestureRecognizer(BoxCreator) //action de criar box ao clicar na grid
         super.viewDidLoad()
     }
     
     func setupCamera(){
         
-        //1
+        //criando cena
         let cameraReference = SCNNode()
         cameraReference.position = SCNVector3(x: 0, y: 0, z: 0)
         scene.rootNode.addChildNode(cameraReference)
@@ -294,7 +288,7 @@ class GameViewController: UIViewController {
                 }//ok
                 
                 //Regras
-                
+                //Caso celula esteja viva
                 if colunasGrid[xColunas][zLinhas] == true {
                     if countVizinhos < 2 {
                         colunasNextGenGrid[Int(xColunas)][Int(zLinhas)] = false
@@ -306,7 +300,7 @@ class GameViewController: UIViewController {
                         colunasNextGenGrid[Int(xColunas)][Int(zLinhas)] = colunasGrid[Int(xColunas)][Int(zLinhas)]
                     }
                 }
-                //tentar colocar else if
+                //Caso celula esteja morta
                 if colunasGrid[xColunas][zLinhas] == false {
                     if countVizinhos == 3 {
                         colunasNextGenGrid[Int(xColunas)][Int(zLinhas)] = true
@@ -317,32 +311,29 @@ class GameViewController: UIViewController {
                     
                 }
                 
-                
-                
                 countVizinhos = 0
                 
             }
         }
         
-        
+        //remove os cubos da tela e do array de cubos
         for removeIndex:Int in 0...(arrayCubos.count - 1) {
             arrayCubos[removeIndex].removeFromParentNode()
         }
         arrayCubos.removeAll()
         
         
-        
+        //Coloca os cubos na nova cena a partir da nova matriz atualizada
         for xColunaLoop:Int in 0...gridSize{
             for zLinhasLoop:Int in 0...gridSize{
                 if colunasNextGenGrid[Int(xColunaLoop)][Int(zLinhasLoop)] == true {
                     let boxNode = Cubo().CreateCubo(x: Float(xColunaLoop), y: 0.5, z: Float(zLinhasLoop))
-                    
                     scene.rootNode.addChildNode(boxNode)
                     arrayCubos.append(boxNode)
                 }
             }
         }
-        
+        //a matriz antiga é finalmente atualizada
         colunasGrid = colunasNextGenGrid
         
         
